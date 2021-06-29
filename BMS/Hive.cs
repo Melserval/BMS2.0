@@ -36,19 +36,19 @@ namespace BMS
         private int beeCount;
 
         // TODO: После тестирование перенести создание координат в конструктор.
-        private Dictionary<string, Point> places = new Dictionary<string, Point>
+        private Dictionary<PlaceName, Point> places = new Dictionary<PlaceName, Point>
         {
-            { "entrance", new Point(600, 100) },
-            {"nursery", new Point(95, 174) },
-            {"factory", new Point(157, 98) },
-            {"exit", new Point(194, 213) }
+            { PlaceName.entrance, new Point(600, 100) },
+            { PlaceName.nursery, new Point(95, 174) },
+            { PlaceName.factory, new Point(157, 98) },
+            { PlaceName.exit, new Point(194, 213) }
         };
 
         public void InitializeLocations(Point entrance, Point nursery, Point factory, Point exit) { 
         
         }
 
-        public Point GetLocation(string placeName)
+        public Point GetLocation(PlaceName placeName)
         {
             if (places.ContainsKey(placeName)) return places[placeName];
             throw new ArgumentException($"Unknow location: {placeName}");
@@ -60,9 +60,43 @@ namespace BMS
             for (int i = 0; i < initBeeCount; i++) AddBee();
         }
 
-        public bool AddHoney(double nectar) => true;
-        public bool ConsumeHoney(double amount) => true;
-        private void AddBee() { }
-        public void Go() { }
+        // переработка меда из нектара.
+        public bool AddHoney(double nectar)
+        {
+            double honeyToAdd = nectar * nectarHoneyRatio;
+            if (honeyToAdd + this.Honey > maxHoney) return false;
+            this.Honey += honeyToAdd;
+            return true;
+        }
+
+        // Выдача меда из улья.
+        public bool ConsumeHoney(double amount)
+        {
+            if (amount > this.Honey) return false;
+            this.Honey -= amount;
+            return true;
+        }
+
+        // Порождение новой пчелы.
+        private void AddBee() 
+        {
+            this.beeCount++;
+            Point beeStartPoint = new Point(
+                places[PlaceName.nursery].X + rand.Next(100) - 50,// 50 - на столько единиц может отстоять
+                places[PlaceName.nursery].Y + rand.Next(100) - 50 // точка от питомника по осям X и Y.
+            );
+            Bee newBee = new Bee(beeCount, beeStartPoint);
+            // TODO: добавить пчелу в систему...
+        }
+
+        
+        public void Go() 
+        { 
+            if (this.Honey > minHoneyForUpPopula)
+            {
+                // если повезет может родиться новая пчела...
+                if (rand.Next(10) == 1) AddBee();
+            }
+        }
     }
 }
