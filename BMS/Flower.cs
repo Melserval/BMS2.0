@@ -10,33 +10,24 @@ namespace BMS
     // Информация о цветке и его судьбе.
     class Flower
     {
+        // максимально возможное количество нектара.
+        protected const double MaxNectar = 5;
+
+        // нектар порождаемый по мере роста цветка.
+        protected const double NectarAddedPerTurn = 0.01;
+
+        // нектар доступный для сбора за один цикл.
+        protected const double NectarGatheredPerTurn = 0.3;
+
         public Flower(Point location, Random rand)
         {
             Location = location;
             Age = 0;
             Alive = true;
-            Nectar = InitialNextar;
-            lifespan = rand.Next(LifeSpanMin, LifeSpanMax + 1);
+            Nectar = 1.50;
+            lifespan = rand.Next(15000, 30000);
             NectarHarvested = 0;
         }
-
-        // минимальная продолжительность жизни.
-        protected const int LifeSpanMin = 15_000;
-
-        // максимальная продолжительность жизни.
-        protected const int LifeSpanMax = 30_000;
-
-        // начальное количество нектара.
-        protected double InitialNextar = 1.50;
-
-        // максимально возможное количество нектара.
-        protected double MaxNectar = 5;
-
-        // нектар добавляемый по мере роста цветка.
-        protected double NectarAddedPerTurn = 0.01;
-
-        // нектар собираемый с цветка за один цикл.
-        protected double NectarGatheredPerTurn = 0.3;
 
         // расположение цветка.
         public Point Location { get; protected set; }
@@ -50,7 +41,7 @@ namespace BMS
         // Количество доступного нектара.
         public double Nectar { get; protected set; }
 
-        // Общее количество собранного нектара.
+        // Общее количество собранного c цветка нектара.
         public double NectarHarvested { get; protected set; }
 
         // продолжительность жизни.
@@ -59,26 +50,27 @@ namespace BMS
         // отдача нектара пчеле.
         public double HarvestNectar() 
         {
-            if (NectarGatheredPerTurn > Nectar) return 0;
-            Nectar -= NectarGatheredPerTurn;
-            return NectarHarvested += NectarGatheredPerTurn;
+            if (this.Nectar >= NectarGatheredPerTurn)
+            {
+                this.Nectar -= NectarGatheredPerTurn;
+                this.NectarHarvested += NectarGatheredPerTurn;
+                return NectarGatheredPerTurn;
+            }
+            return 0;
         }
 
         // один жизненный цикл цветка.
         public void Go()
         {
-            if (Age < lifespan)
+            if (this.Alive)
             {
-                if (Nectar < MaxNectar)
-                {
-                    if ((Nectar + NectarAddedPerTurn) > MaxNectar)
-                        Nectar = MaxNectar;
-                    else
-                        Nectar += NectarAddedPerTurn;
-                    // TODO: Что делать если цветок жив, но нектар достиг максимума?
-                }
-                Age++;
-                if (Age == lifespan) Alive = false;
+                this.Age++;
+                if (this.Age >= this.lifespan) this.Alive = false;
+                if (this.Nectar >= MaxNectar) return;
+                this.Nectar = (this.Nectar + NectarAddedPerTurn) >= MaxNectar
+                    ? MaxNectar
+                    : this.Nectar + NectarAddedPerTurn;
+                // TODO: Что делать если цветок жив, но нектар достиг максимума?
             }
         }
     }
