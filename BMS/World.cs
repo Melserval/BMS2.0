@@ -17,8 +17,8 @@ namespace BMS
         // координаты границ цветочного поля.
         private const int field_minX = 15;
         private const int field_maxX = 177;
-        private const int field_minY = 690;
-        private const int field_maxY = 290;
+        private const int field_minY = 290;
+        private const int field_maxY = 690;
 
         public Hive hive;
         public List<Bee> bees;
@@ -30,6 +30,7 @@ namespace BMS
         {
             bees = new List<Bee>();
             flowers = new List<Flower>();
+            hive = new Hive(this);
             for (int i = 0; i < 10; i++) AddFlower();
         }
 
@@ -38,16 +39,17 @@ namespace BMS
             double all_nectar_harvested = 0;
             this.hive.Go();
             // попутно избавляемся от больше не работающих пчел...
-            this.bees = this.bees.Where(bee => { 
+            this.bees = this.bees.Where(bee =>
+            {
                 bee.Go();
-                return bee.CurrentState != BeeState.Retired; 
-            }) as List<Bee>;
+                return bee.CurrentState != BeeState.Retired;
+            }).ToList<Bee>();
             // и увядших цветов. 
             this.flowers = this.flowers.Where(flower => {
                 flower.Go();
                 all_nectar_harvested += flower.NectarHarvested;
                 return flower.Alive;
-            }) as List<Flower>;
+            }).ToList<Flower>();
 
             // если разница между количеством собранного со всех цветов нектара от последней записи
             // составляет разницу достаточную для появления нового цветка.

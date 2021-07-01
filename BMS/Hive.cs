@@ -34,6 +34,7 @@ namespace BMS
         public double Honey { get; private set; }
         private Point location;
         private int beeCount;
+        private World myWorld;
 
         // TODO: После тестирование перенести создание координат в конструктор.
         private Dictionary<PlaceName, Point> places = new Dictionary<PlaceName, Point>
@@ -54,9 +55,10 @@ namespace BMS
             throw new ArgumentException($"Unknow location: {placeName}");
         }
 
-        public Hive()
+        public Hive(World world)
         {
             Honey = initHoney;
+            myWorld = world;
             for (int i = 0; i < initBeeCount; i++) AddBee();
         }
 
@@ -80,13 +82,19 @@ namespace BMS
         // Порождение новой пчелы.
         private void AddBee() 
         {
+            if (! (this.beeCount < maxBeePopulation))
+            {
+                throw new Exception("Превышен лимит на количество пчел!");
+            }
+
             this.beeCount++;
             Point beeStartPoint = new Point(
                 places[PlaceName.nursery].X + rand.Next(100) - 50,// 50 - на столько единиц может отстоять
                 places[PlaceName.nursery].Y + rand.Next(100) - 50 // точка от питомника по осям X и Y.
             );
-            Bee newBee = new Bee(beeCount, beeStartPoint);
-            // TODO: добавить пчелу в систему...
+            Bee newBee = new Bee(beeCount, beeStartPoint, myWorld, this);
+            // TODO: добавить пчелу в систему. Нужно коллецию чел привязать к улью. Или как то учитывать их количество.
+            this.myWorld.bees.Add(newBee);
         }
 
         
