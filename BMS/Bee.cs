@@ -49,6 +49,8 @@ namespace BMS
         }
         // текущее состояние пчелы.
         protected BeeState CurrentState { get; set; }
+        // выработала ли свой ресурс пчела.
+        public bool isRetired => this.CurrentState == BeeState.Retired;
 
         protected Hive myHive;
         protected World myWorld;
@@ -118,7 +120,6 @@ namespace BMS
 
         ///--- дейсвия для пчелы при выполнении директив BeeState. ---///
         
-        // свободна, ничем не занята.
         protected void bsIdle()
         {
             if (Age > CARIER_SPAN) {
@@ -136,7 +137,6 @@ namespace BMS
             // TODO: Что делать если нет цветов или улей не выдал мед?!
         }
 
-        // полет к цветку.
         protected void bsFlyingToFlower()
         {
             // цветок не существует - возврат в улей.
