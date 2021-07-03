@@ -7,150 +7,204 @@ using System.Drawing;
 
 namespace BMS
 {
-    // Чем сейчас занята пчела.
-    enum BeeState: byte
-    {
-        Idle,            // Свободна
-        FlyingToFlower,  // Летит на цветок
-        GatheringNectar, // Собирает нектар
-        ReturningToHive, // Возвращается в улей
-        MakingHoney,     // Производит мед
-        Retired          // Завершение работы
-    }
+
 
     // Пчела.
     class Bee
     {
-        protected const double HoneyConsumed = 0.5;
-        protected const int MoveRate = 3; 
-        // минимально необходимое количество для сбора.
-        protected const double MinimumFlowerNectar = 1.5;
-        protected const int CareerSpan = 1000;
-        
-        protected Point location;
-        protected Random rand = new Random();
-        public BeeState CurrentState { get; protected set; }
+        // потребление меда пчелой.
+        protected const double HONEY_CONSUMED = 0.5;
+        // единиц перемещения за цикл.
+        protected const int MOVE_RATE = 3;
+        // минимальное содержание нектара в цветке для сбора.
+        protected const double MIN_FLOWER_NECTAR = 1.5;
+        // продолжительность существования пчелы.
+        protected const int CARIER_SPAN = 1000;
+        // общее количество созданных пчел.
+        protected static int _beeBorned = 0;
 
+        // возраст пчелы.
         public int Age { get; protected set; } = 0;
+        // пчела внутри улья.
         public bool InsideHive { get; protected set; }
+        // количество нектара у пчелы.
         public double NectarCollected { get; protected set; }
+        // место нахождения пчелы.
+        protected Point location;
         public Point Location { get => location; }
+        // идентификатор пчелы.
+        protected int ID;
+        // цветок для сбора нектара.
+        protected Flower destinationFlower;
 
-        private int ID;
-        private Flower destinationFlower;
-        private Hive myHive;
-        private World myWorld;
-        private Dictionary<BeeState, Action> beeAction;
+        // Состояния И/ИЛИ ДИРЕКТИВЫ пчелы.    
+        protected enum BeeState : byte
+        {
+            Idle,            // Свободна
+            FlyingToFlower,  // Летит на цветок
+            GatheringNectar, // Собирает нектар
+            ReturningToHive, // Возвращается в улей
+            MakingHoney,     // Производит мед
+            Retired          // Завершение работы
+        }
+        // текущее состояние пчелы.
+        protected BeeState CurrentState { get; set; }
 
-        public Bee(int id, Point location, World world, Hive hive)
+        protected Hive myHive;
+        protected World myWorld;
+        protected Dictionary<BeeState, Action> beeAction;
+
+        public Bee(int id, Point startLocation, World world, Hive hive)
         {
             ID = id;
             Age = 0;
-            this.location = location;
+            this.location = startLocation;
             InsideHive = true;
-            CurrentState = BeeState.Idle;
             destinationFlower = null;
             NectarCollected = 0;
+            CurrentState = BeeState.Idle;
             myHive = hive;
             myWorld = world;
-            beeAction = new Dictionary<BeeState, Action>();
-            beeAction.Add(BeeState.Idle, bsIdle);
-            beeAction.Add(BeeState.FlyingToFlower, bsFlyingToFlower);
-            beeAction.Add(BeeState.GatheringNectar, bsGatheringNectar);
-            beeAction.Add(BeeState.ReturningToHive, bsReturningToHive);
-            beeAction.Add(BeeState.MakingHoney, bsMakingHoney);
+
+            beeAction = new Dictionary<BeeState, Action>() {
+                {BeeState.Idle,            bsIdle },
+                {BeeState.FlyingToFlower,  bsFlyingToFlower },
+                {BeeState.GatheringNectar, bsGatheringNectar },
+                {BeeState.MakingHoney,     bsMakingHoney },
+                {BeeState.ReturningToHive, bsReturningToHive },
+                {BeeState.Retired,         bsRetired }
+            };
         }
 
         public void Go()
         {
             Age++;
-            this.beeAction[CurrentState]?.Invoke();
+            this.beeAction[this.CurrentState]?.Invoke();
         }
 
-        private bool MoveTowardsLocation(Point destination)
+        // перемещение в указанную точку. 
+        // за цикл - одно смещение на растояние "MoveRate".
+        protected bool MoveTo(Point destination)
         {
-            if (Math.Abs(destination.X - Location.X) <= MoveRate &&
-                Math.Abs(destination.Y - Location.Y) <= MoveRate)
-            {
-                return true;
-            }
+            // вычисление разности между текущим и заданным местоположениями.
+            bool xComplete = (Math.Abs(destination.X - location.X) <= MOVE_RATE);
+            bool yComplete = (Math.Abs(destination.Y - location.Y) <= MOVE_RATE);
 
-            if (destination.X > Location.X)
+            if (!xComplete)
             {
-                (location).X += MoveRate;
-            } 
-            else if (destination.X < location.X)
-            {
-                location.X -= MoveRate;
-            }
-
-            if (destination.Y > location.Y)
-            {
-                location.Y += MoveRate;
-            }
-            else if (destination.Y < location.Y)
-            {
-                location.Y -= MoveRate;
-            }
-            return false;
-        }
-
-        // дейсвия для определенных состояний пчелы. из перечня BeeState.
-        
-        private void bsIdle()
-        {
-            if (Age > CareerSpan) {
-                CurrentState = BeeState.Retired;
-            }
-            else if (myWorld.flowers.Count > 0 && myHive.ConsumeHoney(HoneyConsumed)) {
-                Flower flower = myWorld.flowers[rand.Next(myWorld.flowers.Count)];
-                if (flower.Nectar >= MinimumFlowerNectar && flower.Alive) {
-                    destinationFlower = flower;
-                    CurrentState = BeeState.FlyingToFlower;
+                if (destination.X > Location.X)
+                {
+                    location.X += MOVE_RATE;
+                }
+                else
+                {
+                    location.X -= MOVE_RATE;
                 }
             }
+
+            if (!yComplete)
+            {
+                if (destination.Y > location.Y)
+                {
+                    location.Y += MOVE_RATE;
+                }
+                else
+                {
+                    location.Y -= MOVE_RATE;
+                }
+            }
+            return xComplete && yComplete;
         }
 
-        private void bsFlyingToFlower()
+        ///--- дейсвия для пчелы при выполнении директив BeeState. ---///
+        
+        // свободна, ничем не занята.
+        protected void bsIdle()
         {
+            if (Age > CARIER_SPAN) {
+                CurrentState = BeeState.Retired;
+                return;
+            }
+            // Если есть доступные цветы и мед в улье для пропитания, пчелы должна опылять цветы.
+            if (myWorld.flowers.Count > 0 && myHive.ConsumeHoney(HONEY_CONSUMED)) {
+                Flower flower = myWorld.flowers[rand.Next(myWorld.flowers.Count)];
+                if (flower.Nectar >= MIN_FLOWER_NECTAR && flower.Alive) {
+                    this.destinationFlower = flower;
+                    CurrentState = BeeState.FlyingToFlower; // директива.
+                }
+            }
+            // TODO: Что делать если нет цветов или улей не выдал мед?!
+        }
+
+        // полет к цветку.
+        protected void bsFlyingToFlower()
+        {
+            // цветок не существует - возврат в улей.
             if (!myWorld.flowers.Contains(destinationFlower)) {
                 CurrentState = BeeState.ReturningToHive;
+                return;
             }
-            else if ( InsideHive && MoveTowardsLocation(myHive.GetLocation(PlaceName.exit)) ) {
-                InsideHive = false;
-                location = myHive.GetLocation(PlaceName.entrance);
+
+            if (InsideHive == true) {
+                // когда внутри улья, сначала перемещение к выходу наружу.
+                if ( MoveTo(myHive.GetLocation(PlaceName.exit)) ) { 
+                    InsideHive = false;
+                    location = myHive.GetLocation(PlaceName.entrance);
+                }
             }
-            else if (MoveTowardsLocation(destinationFlower.Location)) {
+            else if (MoveTo(destinationFlower.Location)) {
                 CurrentState = BeeState.GatheringNectar;
             }
         }
 
-        private void bsGatheringNectar() {
+        protected void bsGatheringNectar() {
             double nectar = destinationFlower.HarvestNectar();
-            if (nectar > 0) NectarCollected += nectar;
-            else CurrentState = BeeState.ReturningToHive;
-        }
-
-        private void bsReturningToHive()
-        {
-            if (!InsideHive && MoveTowardsLocation(myHive.GetLocation(PlaceName.entrance))) {
-                InsideHive = true;
-                location = myHive.GetLocation(PlaceName.exit);
-            } else if (MoveTowardsLocation(myHive.GetLocation(PlaceName.factory))) {
-                 CurrentState = BeeState.MakingHoney;
+            if (nectar > 0)
+            {
+                NectarCollected += nectar;
+            }
+            else
+            {   // TODO: зачем возвращаться в улей, вместо смены цветка?!
+                CurrentState = BeeState.ReturningToHive;
             }
         }
 
-        private void bsMakingHoney()
+        protected void bsReturningToHive()
         {
-            if (NectarCollected < 0.5) {
-                NectarCollected = 0;
-                CurrentState = BeeState.Idle;
-            } else if (myHive.AddHoney(0.5)) {
-                    NectarCollected -= 0.5;
+            if (!InsideHive) {
+                // лезть в улей!
+                if (MoveTo(myHive.GetLocation(PlaceName.entrance)))
+                {
+                    InsideHive = true;
+                    location = myHive.GetLocation(PlaceName.exit);
+
+                }
             } else {
-                 NectarCollected = 0;
+                // что делать внутри.
+                if (MoveTo(myHive.GetLocation(PlaceName.factory)))
+                {
+                    CurrentState = BeeState.MakingHoney;
+                }
             }
+        }
+
+        protected void bsMakingHoney()
+        {
+            // переработка требует минимум 0.5 нектара.
+            if (this.NectarCollected >= 0.5) 
+            {
+
+            } 
+            else // если нектара меньше - он просто выбрасывается.
+            {
+                this.NectarCollected = 0;
+                this.CurrentState = BeeState.Idle;
+            }
+        }
+
+        protected void bsRetired()
+        {
+            Console.WriteLine($"{this.ID}: All Done!") ;
         }
     }
 }
