@@ -13,7 +13,7 @@ namespace BMS
     public partial class Form1 : Form
     {
         private World world;
-        private Random rand = new Random();
+
         private DateTime start = DateTime.Now;
         private DateTime end;
         private int framesRun = 0;
@@ -23,6 +23,12 @@ namespace BMS
         public Form1()
         {
             InitializeComponent();
+            Random rand = new Random();
+            World.rand = rand;
+            Hive.rand = rand;
+            Bee.rand = rand;
+            Flower.rand = rand;
+
             world = new World();
             this.timer_frame.Interval = 50;
             UpdateStats(new TimeSpan());
@@ -35,7 +41,7 @@ namespace BMS
 
             label_beeCount.Text = world.bees.Count.ToString();
             label_flowerCount.Text = world.flowers.Count.ToString();
-            label_honeyCount.Text = $"{world.hive.Honey:f3}";
+            label_honeyCount.Text = $"{world.hive.Honey}";
             label_nectarOnFieldCount.Text = world.flowers.Aggregate(0.0, (total, flower) => total + flower.Nectar).ToString();
             label_frameRun.Text = framesRun.ToString();
 

@@ -10,89 +10,102 @@ namespace BMS
     // Среда обитания пчел - УЛЕЙ
     class Hive
     {
+        public static Random rand;
         // начальное количество пчел.
-        private const int initBeeCount = 6;
-
+        private const int INIT_BEE_COUNT = 6;
         // начальное количество меда.
-        private const double initHoney = 3.2;
-
+        private const double INIT_HONEY = 3.20;
         // максимальное количество меда.
-        private const double maxHoney = 15.0;
-
+        private const double HONEY_MAX_COUNT = 15.0;
         // коффициент переработки нектара в мед.
-        private const double nectarHoneyRatio = 0.25;
-
+        private const double NECTAR_TO_HONEY_RATIO = 0.25;
         // максимальное количество пчел в улье.
-        private const int maxBeePopulation = 18;
-
+        private const int BEE_MAX_POPULATION = 8;
         // минимальное наличие меда для увеличения популяции.
-        private const double minHoneyForUpPopula = 4;
+        private const double HONEY_MIN_FOR_INC_POPULA = 4.0;
 
-        private static Random rand = new Random();
 
         // количество меда в улье.
         public double Honey { get; private set; }
-        private Point location;
+        // количество проживающих пчел.
         private int beeCount;
-        private World myWorld;
+        // расположение объектов улья ВНУТРИ него.
+        private readonly Dictionary<PlaceName, Point> locations;
+        // ссылка на мир в котором существует улей.
+        private readonly World myWorld;
 
-        // TODO: После тестирование перенести создание координат в конструктор.
-        private Dictionary<PlaceName, Point> places = new Dictionary<PlaceName, Point>
-        {
-            { PlaceName.entrance, new Point(600, 100) },
-            { PlaceName.nursery, new Point(95, 174) },
-            { PlaceName.factory, new Point(157, 98) },
-            { PlaceName.exit, new Point(194, 213) }
-        };
-
-        public void InitializeLocations(Point entrance, Point nursery, Point factory, Point exit) { 
-        
-        }
-
-        public Point GetLocation(PlaceName placeName)
-        {
-            if (places.ContainsKey(placeName)) return places[placeName];
-            throw new ArgumentException($"Unknow location: {placeName}");
-        }
 
         public Hive(World world)
         {
-            Honey = initHoney;
+            if (rand == null)
+            {
+                throw new ArgumentNullException($"Неустановлен Rand в {nameof(Hive)}");
+            }
+            Honey = 3.20;
             myWorld = world;
-            for (int i = 0; i < initBeeCount; i++) AddBee();
+            // координаты относительно внутреннего пространства улья.
+            locations = new Dictionary<PlaceName, Point>
+            {
+                { PlaceName.entrance, new Point(600, 100) },
+                { PlaceName.nursery,  new Point(95, 174)  },
+                { PlaceName.factory,  new Point(157, 98)  },
+                { PlaceName.exit,     new Point(194, 213) }
+            };
+
+            for (int i = 0; i < INIT_BEE_COUNT; i++)
+            {
+                AddBee();
+            }
         }
+
+        // выдает координаты внутреннего объекта улья.
+        public Point GetLocation(PlaceName placeName)
+        {
+            if (this.locations.ContainsKey(placeName))
+            {
+                return this.locations[placeName];
+            }
+            throw new ArgumentException($"Unknow location: {placeName}");
+        }
+
 
         // переработка меда из нектара.
         public bool AddHoney(double nectar)
         {
-            double honeyToAdd = nectar * nectarHoneyRatio;
-            if (honeyToAdd + this.Honey > maxHoney) return false;
-            this.Honey += honeyToAdd;
-            return true;
+            double additionHoney = nectar * NECTAR_TO_HONEY_RATIO;
+            if ((this.Honey + additionHoney) <= HONEY_MAX_COUNT)
+            {
+                this.Honey += additionHoney;
+                return true;
+            }
+            return false;
         }
 
-        // Выдача меда из улья.
+        // Выдача меда потребителям из запасов улья.
         public bool ConsumeHoney(double amount)
         {
-            if (amount > this.Honey) return false;
-            this.Honey -= amount;
-            return true;
+            if (amount <= this.Honey)
+            {
+                this.Honey -= amount;
+                return true;
+            }
+            return false;
         }
 
         // Порождение новой пчелы.
         private void AddBee() 
         {
-            if (! (this.beeCount < maxBeePopulation))
+            if (! (this.beeCount < BEE_MAX_POPULATION))
             {
                 throw new Exception("Превышен лимит на количество пчел!");
             }
 
+            Point nursery = GetLocation(PlaceName.nursery);
+            // точка рождения (появления) пчелы может отличаться от точки питомника на +- 50 единиц.
+            Point bornp = new Point(nursery.X + rand.Next(100) - 50, nursery.Y + rand.Next(100) - 50);
+            Bee newBee = new Bee(beeCount, bornp, myWorld, this);
             this.beeCount++;
-            Point beeStartPoint = new Point(
-                places[PlaceName.nursery].X + rand.Next(100) - 50,// 50 - на столько единиц может отстоять
-                places[PlaceName.nursery].Y + rand.Next(100) - 50 // точка от питомника по осям X и Y.
-            );
-            Bee newBee = new Bee(beeCount, beeStartPoint, myWorld, this);
+
             // TODO: добавить пчелу в систему. Нужно коллецию чел привязать к улью. Или как то учитывать их количество.
             this.myWorld.bees.Add(newBee);
         }
@@ -100,10 +113,14 @@ namespace BMS
         
         public void Go() 
         { 
-            if (this.Honey > minHoneyForUpPopula)
+            if (this.Honey > HONEY_MIN_FOR_INC_POPULA)
             {
                 // если повезет может родиться новая пчела...
-                if (rand.Next(10) == 1) AddBee();
+                // TODO: Заглушка пока не привели пчелиную королеву.
+                if (rand.Next(10) == 1)
+                {
+                    AddBee();
+                }
             }
         }
     }

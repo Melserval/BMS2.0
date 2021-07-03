@@ -10,61 +10,78 @@ namespace BMS
     // Основной класс контейнер управляющий остальными компонентами.
     class World
     {
+        public static Random rand;
         // количество собранного нектара, при сборе которого было
         // опылено достаточное количество цветов для рождения нового.
-        private const double nectarHarvestPerNewFlower = 50.0;
-        
+        private const double NECTAR_HARVEST_FP_FLOWER = 50.0;
+
         // координаты границ цветочного поля.
-        private const int field_minX = 15;
-        private const int field_maxX = 177;
-        private const int field_minY = 290;
-        private const int field_maxY = 690;
+        private const int FIELD_MIN_X = 15;
+        private const int FIELD_MIN_Y = 177;
+        private const int FIELD_MAX_X = 690;
+        private const int FIELD_MAX_Y = 290;
+
 
         public Hive hive;
         public List<Bee> bees;
         public List<Flower> flowers;
-        private Random rand = new Random();
-        private double totalNectarHarvested = 0;
+
 
         public World()
         {
+            if (rand == null)
+            {
+                throw new ArgumentNullException($"Неустановлен Rand в {nameof(World)}");
+            }
             bees = new List<Bee>();
             flowers = new List<Flower>();
             hive = new Hive(this);
-            for (int i = 0; i < 10; i++) AddFlower();
+            for (int i = 0; i < 10; i++)
+            {
+                AddFlower();
+            }
+
         }
 
         public void Go()
         {
-            double all_nectar_harvested = 0;
             this.hive.Go();
-            // попутно избавляемся от больше не работающих пчел...
-            this.bees = this.bees.Where(bee =>
+            // обратная нумераци для корректного смещения индекса при удалении элемента.
+            for (int i = this.bees.Count - 1; i >= 0; i--)
             {
-                bee.Go();
-                return bee.CurrentState != BeeState.Retired;
-            }).ToList<Bee>();
-            // и увядших цветов. 
-            this.flowers = this.flowers.Where(flower => {
-                flower.Go();
-                all_nectar_harvested += flower.NectarHarvested;
-                return flower.Alive;
-            }).ToList<Flower>();
+                Bee b = this.bees[i];
+                b.Go();
+                if (b.IsRetired)
+                {
+                    this.bees.RemoveAt(i);
+                }
+            }
+            double totalNectarHarvested = 0;
+            for (int i = this.flowers.Count - 1; i >= 0; i--)
+            {
+                Flower f = this.flowers[i];
+                f.Go();
+                totalNectarHarvested += f.NectarHarvested;
+                if(f.Alive == false)
+                {
+                    this.flowers.RemoveAt(i);
+                }
+            }
 
-            // если разница между количеством собранного со всех цветов нектара от последней записи
-            // составляет разницу достаточную для появления нового цветка.
-            if ( (all_nectar_harvested - this.totalNectarHarvested) >= nectarHarvestPerNewFlower)
+            // возможно, было собрано количество нектара, при сборе которого
+            // было опылено достаточное количество цветов, что бы родился новый.
+            if (totalNectarHarvested > NECTAR_HARVEST_FP_FLOWER)
             {
-                this.totalNectarHarvested = all_nectar_harvested;
-                AddFlower();
+                this.AddFlower();
+                this.flowers.ForEach(f => f.NectarHarvested = 0);
             }
         }
 
         private void AddFlower()
         {
-            int x = rand.Next(field_minX, field_maxX);
-            int y = rand.Next(field_minY, field_maxY);
-            flowers.Add(new Flower(new Point(x, y), rand));
+            Point bornp = new Point(rand.Next(FIELD_MIN_X, FIELD_MAX_X),
+                                    rand.Next(FIELD_MIN_Y, FIELD_MAX_Y));
+            flowers.Add(new Flower(bornp));
         }
     }
 }

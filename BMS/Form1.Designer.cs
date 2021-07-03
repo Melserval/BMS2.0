@@ -51,6 +51,7 @@ namespace BMS
             this.label_frameRun = new System.Windows.Forms.Label();
             this.label_frameRate = new System.Windows.Forms.Label();
             this.timer_frame = new System.Windows.Forms.Timer(this.components);
+            this.textBox_serviceOutput = new System.Windows.Forms.TextBox();
             this.toolStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -64,7 +65,7 @@ namespace BMS
             this.toolStripButton_reset});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(332, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(329, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -97,9 +98,9 @@ namespace BMS
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 292);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 369);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(332, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(329, 22);
             this.statusStrip1.TabIndex = 1;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -277,11 +278,25 @@ namespace BMS
             this.timer_frame.Interval = 1000;
             this.timer_frame.Tick += new System.EventHandler(this.timer_frame_Tick);
             // 
+            // textBox_serviceOutput
+            // 
+            this.textBox_serviceOutput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBox_serviceOutput.Cursor = System.Windows.Forms.Cursors.No;
+            this.textBox_serviceOutput.Enabled = false;
+            this.textBox_serviceOutput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.textBox_serviceOutput.Location = new System.Drawing.Point(8, 233);
+            this.textBox_serviceOutput.Multiline = true;
+            this.textBox_serviceOutput.Name = "textBox_serviceOutput";
+            this.textBox_serviceOutput.ReadOnly = true;
+            this.textBox_serviceOutput.Size = new System.Drawing.Size(310, 123);
+            this.textBox_serviceOutput.TabIndex = 3;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(332, 314);
+            this.ClientSize = new System.Drawing.Size(329, 391);
+            this.Controls.Add(this.textBox_serviceOutput);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.toolStrip1);
@@ -320,6 +335,7 @@ namespace BMS
         private System.Windows.Forms.Timer timer_frame;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label_frameRate;
+        private System.Windows.Forms.TextBox textBox_serviceOutput;
     }
 }
 

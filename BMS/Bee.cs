@@ -12,6 +12,7 @@ namespace BMS
     // Пчела.
     class Bee
     {
+        public static Random rand;
         // потребление меда пчелой.
         protected const double HONEY_CONSUMED = 0.5;
         // единиц перемещения за цикл.
@@ -21,7 +22,8 @@ namespace BMS
         // продолжительность существования пчелы.
         protected const int CARIER_SPAN = 1000;
         // общее количество созданных пчел.
-        protected static int _beeBorned = 0;
+        protected static int beeBorned = 0;
+
 
         // возраст пчелы.
         public int Age { get; protected set; } = 0;
@@ -50,7 +52,7 @@ namespace BMS
         // текущее состояние пчелы.
         protected BeeState CurrentState { get; set; }
         // выработала ли свой ресурс пчела.
-        public bool isRetired => this.CurrentState == BeeState.Retired;
+        public bool IsRetired => this.CurrentState == BeeState.Retired;
 
         protected Hive myHive;
         protected World myWorld;
@@ -58,6 +60,10 @@ namespace BMS
 
         public Bee(int id, Point startLocation, World world, Hive hive)
         {
+            if (rand == null)
+            {
+                throw new ArgumentNullException($"Неустановлен Rand в {nameof(Bee)}");
+            }
             ID = id;
             Age = 0;
             this.location = startLocation;
@@ -77,6 +83,7 @@ namespace BMS
                 {BeeState.Retired,         bsRetired }
             };
         }
+
 
         public void Go()
         {
@@ -206,5 +213,6 @@ namespace BMS
         {
             Console.WriteLine($"{this.ID}: All Done!") ;
         }
+
     }
 }

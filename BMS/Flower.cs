@@ -10,6 +10,7 @@ namespace BMS
     // Информация о цветке и его судьбе.
     class Flower
     {
+        public static Random rand;
         // максимальное содержание нектара (вместимость).
         protected const double MAX_NECTAR = 5.0;
         // нектар порождаемый за один цикл.
@@ -30,7 +31,7 @@ namespace BMS
         public int Age { get; protected set; }
         // цветок живой.
         public bool Alive { get; protected set; }
-        // Количество доступного нектара.
+        // количество нектара в цветке.
         public double Nectar { get; protected set; }
         // Общее количество собранного c цветка нектара.
         public double NectarHarvested { get; set; }
@@ -38,8 +39,12 @@ namespace BMS
         protected readonly int lifespan;
 
 
-        public Flower(Point location, Random rand)
+        public Flower(Point location)
         {
+            if (rand == null)
+            {
+                throw new ArgumentNullException($"Неустановлен Rand в {nameof(Flower)}");
+            }
             Location = location;
             Age = 0;
             Alive = true;
