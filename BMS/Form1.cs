@@ -13,12 +13,11 @@ namespace BMS
     public partial class Form1 : Form
     {
         private World world;
-
         private DateTime start = DateTime.Now;
         private DateTime end;
         private int framesRun = 0;
-
         private BtnState btnRun;
+
 
         public Form1()
         {
@@ -28,12 +27,12 @@ namespace BMS
             Hive.rand = rand;
             Bee.rand = rand;
             Flower.rand = rand;
-
             world = new World();
             this.timer_frame.Interval = 50;
             UpdateStats(new TimeSpan());
             this.btnRun = new BtnState(this.toolStripButton_start, "Запуск", "Пауза", "Продолжить");
         }
+
 
         // Обновление статистики на дисплее.
         private void UpdateStats(TimeSpan ts)
@@ -41,8 +40,10 @@ namespace BMS
 
             label_beeCount.Text = world.bees.Count.ToString();
             label_flowerCount.Text = world.flowers.Count.ToString();
-            label_honeyCount.Text = $"{world.hive.Honey}";
-            label_nectarOnFieldCount.Text = world.flowers.Aggregate(0.0, (total, flower) => total + flower.Nectar).ToString();
+            label_honeyCount.Text = $"{world.hive.Honey:f3}";
+            label_nectarOnFieldCount.Text = world.flowers
+                .Aggregate(0.0, (total, flower) => total + flower.Nectar)
+                .ToString("f3");
             label_frameRun.Text = framesRun.ToString();
 
             label_frameRate.Text = ts.TotalMilliseconds != 0.0 
