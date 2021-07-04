@@ -28,9 +28,11 @@ namespace BMS
             Bee.rand = rand;
             Flower.rand = rand;
             world = new World();
-            this.timer_frame.Interval = 50;
-            UpdateStats(new TimeSpan());
             this.btnRun = new BtnState(this.toolStripButton_start, "Запуск", "Пауза", "Продолжить");
+            toolStripStatusLabel_info.Text = "Ожидание запуска";
+            this.timer_frame.Interval = 50;
+            this.timer_frame.Tick += new EventHandler(RunFrame);
+            UpdateStats(new TimeSpan());
         }
 
 
@@ -51,19 +53,15 @@ namespace BMS
                 : "N/A";
         }
 
-        private void RunFrame()
+        private void RunFrame(object sender, EventArgs eventer)
         {
             this.framesRun += 1;
             world.Go();
             end = DateTime.Now;
-            UpdateStats((end - start));
+            UpdateStats((end - this.start));
             start = end;
         }
 
-        private void timer_frame_Tick(object sender, EventArgs e)
-        {
-            RunFrame();
-        }
 
         private void toolStripButton_start_Click(object sender, EventArgs e)
         {
@@ -71,15 +69,18 @@ namespace BMS
             {
                 case 0:
                     this.timer_frame.Start();
-                    this.btnRun.State = 1; 
+                    this.btnRun.State = 1;
+                    toolStripStatusLabel_info.Text = "Работаю.";
                     return;
                 case 1: 
                     this.btnRun.State = 2;
                     this.timer_frame.Stop();
+                    toolStripStatusLabel_info.Text = "Приостановлен.";
                     return;
                 case 2: 
                     this.btnRun.State = 1;
                     this.timer_frame.Start();
+                    toolStripStatusLabel_info.Text = "Работаю.";
                     return;
                 default: 
                     this.btnRun.State = 0; 
@@ -94,6 +95,7 @@ namespace BMS
             this.world = new World();
             this.UpdateStats(new TimeSpan());
             this.btnRun.State = 0;
+            toolStripStatusLabel_info.Text = "Ожидание запуска(2)";
         }
     }
 }

@@ -31,12 +31,12 @@ namespace BMS
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.toolStrip_mainControll = new System.Windows.Forms.ToolStrip();
             this.toolStripButton_start = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripButton_reset = new System.Windows.Forms.ToolStripButton();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.statusStrip_footer = new System.Windows.Forms.StatusStrip();
+            this.toolStripStatusLabel_info = new System.Windows.Forms.ToolStripStatusLabel();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -52,22 +52,22 @@ namespace BMS
             this.label_frameRate = new System.Windows.Forms.Label();
             this.timer_frame = new System.Windows.Forms.Timer(this.components);
             this.textBox_serviceOutput = new System.Windows.Forms.TextBox();
-            this.toolStrip1.SuspendLayout();
-            this.statusStrip1.SuspendLayout();
+            this.toolStrip_mainControll.SuspendLayout();
+            this.statusStrip_footer.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // toolStrip1
+            // toolStrip_mainControll
             // 
-            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStrip_mainControll.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripButton_start,
             this.toolStripSeparator1,
             this.toolStripButton_reset});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
-            this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(329, 25);
-            this.toolStrip1.TabIndex = 0;
-            this.toolStrip1.Text = "toolStrip1";
+            this.toolStrip_mainControll.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip_mainControll.Name = "toolStrip_mainControll";
+            this.toolStrip_mainControll.Size = new System.Drawing.Size(329, 25);
+            this.toolStrip_mainControll.TabIndex = 0;
+            this.toolStrip_mainControll.Text = "toolStrip1";
             // 
             // toolStripButton_start
             // 
@@ -94,21 +94,21 @@ namespace BMS
             this.toolStripButton_reset.Text = "Сбросить";
             this.toolStripButton_reset.Click += new System.EventHandler(this.toolStripButton_reset_Click);
             // 
-            // statusStrip1
+            // statusStrip_footer
             // 
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripStatusLabel1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 369);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(329, 22);
-            this.statusStrip1.TabIndex = 1;
-            this.statusStrip1.Text = "statusStrip1";
+            this.statusStrip_footer.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripStatusLabel_info});
+            this.statusStrip_footer.Location = new System.Drawing.Point(0, 369);
+            this.statusStrip_footer.Name = "statusStrip_footer";
+            this.statusStrip_footer.Size = new System.Drawing.Size(329, 22);
+            this.statusStrip_footer.TabIndex = 1;
+            this.statusStrip_footer.Text = "statusStrip1";
             // 
-            // toolStripStatusLabel1
+            // toolStripStatusLabel_info
             // 
-            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(103, 17);
-            this.toolStripStatusLabel1.Text = "что происходит...";
+            this.toolStripStatusLabel_info.Name = "toolStripStatusLabel_info";
+            this.toolStripStatusLabel_info.Size = new System.Drawing.Size(103, 17);
+            this.toolStripStatusLabel_info.Text = "что происходит...";
             // 
             // tableLayoutPanel1
             // 
@@ -276,7 +276,6 @@ namespace BMS
             // timer_frame
             // 
             this.timer_frame.Interval = 1000;
-            this.timer_frame.Tick += new System.EventHandler(this.timer_frame_Tick);
             // 
             // textBox_serviceOutput
             // 
@@ -298,14 +297,14 @@ namespace BMS
             this.ClientSize = new System.Drawing.Size(329, 391);
             this.Controls.Add(this.textBox_serviceOutput);
             this.Controls.Add(this.tableLayoutPanel1);
-            this.Controls.Add(this.statusStrip1);
-            this.Controls.Add(this.toolStrip1);
+            this.Controls.Add(this.statusStrip_footer);
+            this.Controls.Add(this.toolStrip_mainControll);
             this.Name = "Form1";
             this.Text = "Behave Management System 2.0";
-            this.toolStrip1.ResumeLayout(false);
-            this.toolStrip1.PerformLayout();
-            this.statusStrip1.ResumeLayout(false);
-            this.statusStrip1.PerformLayout();
+            this.toolStrip_mainControll.ResumeLayout(false);
+            this.toolStrip_mainControll.PerformLayout();
+            this.statusStrip_footer.ResumeLayout(false);
+            this.statusStrip_footer.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);
@@ -315,12 +314,12 @@ namespace BMS
 
         #endregion
 
-        private System.Windows.Forms.ToolStrip toolStrip1;
+        private System.Windows.Forms.ToolStrip toolStrip_mainControll;
         private System.Windows.Forms.ToolStripButton toolStripButton_start;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripButton toolStripButton_reset;
-        private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.StatusStrip statusStrip_footer;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel_info;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
