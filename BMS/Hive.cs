@@ -15,7 +15,7 @@ namespace BMS
         private const int INIT_BEE_COUNT = 6;
         // начальное количество меда.
         private const double INIT_HONEY = 3.20;
-        // максимальное количество меда.
+        // максимум меда вмещаемого ульем.
         private const double HONEY_MAX_COUNT = 15.0;
         // коффициент переработки нектара в мед.
         private const double NECTAR_TO_HONEY_RATIO = 0.25;
@@ -27,6 +27,8 @@ namespace BMS
 
         // количество меда в улье.
         public double Honey { get; private set; }
+        // сколько еще меда поместится в улей.
+        public double StoreLimit => HONEY_MAX_COUNT - this.Honey;
         // количество проживающих пчел.
         private int beeCount;
         // расположение объектов улья ВНУТРИ него.
@@ -52,7 +54,7 @@ namespace BMS
                 { PlaceName.exit,     new Point(194, 213) }
             };
 
-            for (int i = 0; i < INIT_BEE_COUNT; i++)
+            for (int i = 0; i < INIT_BEE_COUNT && this.beeCount < BEE_MAX_POPULATION; i++)
             {
                 AddBee();
             }
@@ -95,11 +97,6 @@ namespace BMS
         // Порождение новой пчелы.
         private void AddBee() 
         {
-            if (! (this.beeCount < BEE_MAX_POPULATION))
-            {
-                throw new Exception("Превышен лимит на количество пчел!");
-            }
-
             Point nursery = GetLocation(PlaceName.nursery);
             // точка рождения (появления) пчелы может отличаться от точки питомника на +- 50 единиц.
             Point bornp = new Point(nursery.X + rand.Next(100) - 50, nursery.Y + rand.Next(100) - 50);
@@ -108,16 +105,17 @@ namespace BMS
 
             // TODO: добавить пчелу в систему. Нужно коллецию чел привязать к улью. Или как то учитывать их количество.
             this.myWorld.bees.Add(newBee);
+
         }
 
         
         public void Go() 
         { 
-            if (this.Honey > HONEY_MIN_FOR_INC_POPULA)
+            if (this.Honey > HONEY_MIN_FOR_INC_POPULA && this.beeCount < BEE_MAX_POPULATION)
             {
                 // если повезет может родиться новая пчела...
                 // TODO: Заглушка пока не привели пчелиную королеву.
-                if (rand.Next(10) == 1)
+                if (rand.Next(7) == 1)
                 {
                     AddBee();
                 }
