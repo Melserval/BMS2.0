@@ -37,6 +37,7 @@ namespace BMS
             this.toolStripButton_reset = new System.Windows.Forms.ToolStripButton();
             this.statusStrip_footer = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel_info = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripStatus_beeStateInfo = new System.Windows.Forms.ToolStripStatusLabel();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -51,7 +52,7 @@ namespace BMS
             this.label_frameRun = new System.Windows.Forms.Label();
             this.label_frameRate = new System.Windows.Forms.Label();
             this.timer_frame = new System.Windows.Forms.Timer(this.components);
-            this.textBox_serviceOutput = new System.Windows.Forms.TextBox();
+            this.listBox_beeStateInfo = new System.Windows.Forms.ListBox();
             this.toolStrip_mainControll.SuspendLayout();
             this.statusStrip_footer.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -97,7 +98,8 @@ namespace BMS
             // statusStrip_footer
             // 
             this.statusStrip_footer.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripStatusLabel_info});
+            this.toolStripStatusLabel_info,
+            this.toolStripStatus_beeStateInfo});
             this.statusStrip_footer.Location = new System.Drawing.Point(0, 369);
             this.statusStrip_footer.Name = "statusStrip_footer";
             this.statusStrip_footer.Size = new System.Drawing.Size(329, 22);
@@ -109,6 +111,12 @@ namespace BMS
             this.toolStripStatusLabel_info.Name = "toolStripStatusLabel_info";
             this.toolStripStatusLabel_info.Size = new System.Drawing.Size(103, 17);
             this.toolStripStatusLabel_info.Text = "что происходит...";
+            // 
+            // toolStripStatus_beeStateInfo
+            // 
+            this.toolStripStatus_beeStateInfo.Name = "toolStripStatus_beeStateInfo";
+            this.toolStripStatus_beeStateInfo.Size = new System.Drawing.Size(17, 17);
+            this.toolStripStatus_beeStateInfo.Text = "--";
             // 
             // tableLayoutPanel1
             // 
@@ -277,25 +285,20 @@ namespace BMS
             // 
             this.timer_frame.Interval = 1000;
             // 
-            // textBox_serviceOutput
+            // listBox_beeStateInfo
             // 
-            this.textBox_serviceOutput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox_serviceOutput.Cursor = System.Windows.Forms.Cursors.No;
-            this.textBox_serviceOutput.Enabled = false;
-            this.textBox_serviceOutput.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.textBox_serviceOutput.Location = new System.Drawing.Point(8, 233);
-            this.textBox_serviceOutput.Multiline = true;
-            this.textBox_serviceOutput.Name = "textBox_serviceOutput";
-            this.textBox_serviceOutput.ReadOnly = true;
-            this.textBox_serviceOutput.Size = new System.Drawing.Size(310, 123);
-            this.textBox_serviceOutput.TabIndex = 3;
+            this.listBox_beeStateInfo.FormattingEnabled = true;
+            this.listBox_beeStateInfo.Location = new System.Drawing.Point(8, 212);
+            this.listBox_beeStateInfo.Name = "listBox_beeStateInfo";
+            this.listBox_beeStateInfo.Size = new System.Drawing.Size(309, 147);
+            this.listBox_beeStateInfo.TabIndex = 3;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(329, 391);
-            this.Controls.Add(this.textBox_serviceOutput);
+            this.Controls.Add(this.listBox_beeStateInfo);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.statusStrip_footer);
             this.Controls.Add(this.toolStrip_mainControll);
@@ -334,7 +337,8 @@ namespace BMS
         private System.Windows.Forms.Timer timer_frame;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label_frameRate;
-        private System.Windows.Forms.TextBox textBox_serviceOutput;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatus_beeStateInfo;
+        private System.Windows.Forms.ListBox listBox_beeStateInfo;
     }
 }
 

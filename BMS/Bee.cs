@@ -13,6 +13,7 @@ namespace BMS
     // Пчела.
     class Bee
     {
+        public static Action<int, string> changeBeeState; 
         public static Random rand;
         // потребление меда пчелой.
         protected const double HONEY_CONSUMED = 0.3;
@@ -48,10 +49,24 @@ namespace BMS
             GatheringNectar, // Собирает нектар
             ReturningToHive, // Возвращается в улей
             MakingHoney,     // Производит мед
-            Retired          // Завершение работы
+            Retired          // Не трудоспособна.
         }
+        // расшифрока статусов, при показе статистики.
+        protected Dictionary<BeeState, string> descripeBeeState;
         // текущее состояние пчелы.
-        protected BeeState CurrentState { get; set; }
+        protected BeeState currentState;
+        protected BeeState CurrentState 
+        {   
+            get
+            {
+                return this.currentState;
+            }
+            set
+            {
+                this.currentState = value;
+                changeBeeState?.Invoke(this.ID, this.descripeBeeState[value]);
+            }
+        }
         // выработала ли свой ресурс пчела.
         public bool IsRetired => this.CurrentState == BeeState.Retired;
 
@@ -66,16 +81,6 @@ namespace BMS
             {
                 throw new ArgumentNullException($"Неустановлен Rand в {nameof(Bee)}");
             }
-            ID = id;
-            Age = 0;
-            location = startLocation;
-            InsideHive = true;
-            destinationFlower = null;
-            NectarCollected = 0;
-            CurrentState = BeeState.Idle;
-            myHive = hive;
-            myWorld = world;
-
             beeAction = new Dictionary<BeeState, Action>() {
                 {BeeState.Idle,            bsIdle },
                 {BeeState.FlyingToFlower,  bsFlyingToFlower },
@@ -84,6 +89,26 @@ namespace BMS
                 {BeeState.ReturningToHive, bsReturningToHive },
                 {BeeState.Retired,         bsRetired }
             };
+            descripeBeeState = new Dictionary<BeeState, string>()
+            {
+                {BeeState.Idle,  "Простаивает" },
+                {BeeState.FlyingToFlower, "Летит к цветку" },
+                {BeeState.GatheringNectar, "Собирает нектар" },
+                {BeeState.ReturningToHive, "Летит в улей" },
+                {BeeState.MakingHoney, "Производит мед" },
+                {BeeState.Retired, "Ресурс исчерпан" }
+            };
+            ID = id;
+            Age = 0;
+            location = startLocation;
+            InsideHive = true;
+            destinationFlower = null;
+            NectarCollected = 0;
+            CurrentState = BeeState.Idle; // TODO: Разобраться почему при первичном запуске все нормально. А при резете - this.descripeBeeState[value] = НУЛЛ!
+            myHive = hive;
+            myWorld = world;
+
+
         }
 
         public void Go()

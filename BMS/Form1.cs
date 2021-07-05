@@ -32,6 +32,8 @@ namespace BMS
             toolStripStatusLabel_info.Text = "Ожидание запуска";
             this.timer_frame.Interval = 50;
             this.timer_frame.Tick += new EventHandler(RunFrame);
+            Bee.changeBeeState += (int id, string message) => this.toolStripStatus_beeStateInfo.Text = $"Bee#{id} {message}";
+            Bee.changeBeeState += (int id, string message) => this.listBox_beeStateInfo.Items.Add($"Bee#{id} {message}");
             UpdateStats(new TimeSpan());
         }
 
