@@ -17,6 +17,7 @@ namespace BMS
         private DateTime end;
         private int framesRun = 0;
         private BtnState btnRun;
+        private Dictionary<BeeState, int> beeStatesStats;
 
 
         public Form1()
@@ -27,13 +28,27 @@ namespace BMS
             Hive.rand = rand;
             Bee.rand = rand;
             Flower.rand = rand;
-            world = new World();
             this.btnRun = new BtnState(this.toolStripButton_start, "Запуск", "Пауза", "Продолжить");
             toolStripStatusLabel_info.Text = "Ожидание запуска";
             this.timer_frame.Interval = 50;
             this.timer_frame.Tick += new EventHandler(RunFrame);
-            Bee.changeBeeState += (int id, string message) => this.toolStripStatus_beeStateInfo.Text = $"Bee#{id} {message}";
-            Bee.changeBeeState += (int id, string message) => this.listBox_beeStateInfo.Items.Add($"Bee#{id} {message}");
+
+            this.beeStatesStats = new Dictionary<BeeState, int>
+            {
+                {BeeState.Idle,  0 },
+                {BeeState.FlyingToFlower, 0 },
+                {BeeState.GatheringNectar, 0 },
+                {BeeState.ReturningToHive, 0 },
+                {BeeState.MakingHoney, 0 },
+                {BeeState.Retired, 0 }
+            };
+            Bee.changeBeeState += (int id, BeeState bsPrev, BeeState bsNew) =>
+            {
+                this.toolStripStatus_beeStateInfo.Text = $"Bee#{id} {bsNew}";
+                this.beeStatesStats[bsNew]++;
+                if (bsNew != bsPrev) this.beeStatesStats[bsPrev]--; //HACK
+            };
+            world = new World();
             UpdateStats(new TimeSpan());
         }
 
@@ -53,6 +68,12 @@ namespace BMS
             label_frameRate.Text = ts.TotalMilliseconds != 0.0 
                 ? String.Format("{0:f0} ({1:f1}ms)", 1000 / ts.TotalMilliseconds, ts.TotalMilliseconds)
                 : "N/A";
+
+            this.listBox_beeStateInfo.Items.Clear();
+            foreach (BeeState stKey in this.beeStatesStats.Keys)
+            {
+                this.listBox_beeStateInfo.Items.Add( $"{stKey, -20} {this.beeStatesStats[stKey]}");
+            }
         }
 
         private void RunFrame(object sender, EventArgs eventer)
@@ -94,6 +115,7 @@ namespace BMS
         {
             this.timer_frame.Stop();
             this.framesRun = 0;
+            Array.ForEach(Enum.GetValues(typeof(BeeState)) as BeeState[], (state) => this.beeStatesStats[state] = 0);
             this.world = new World();
             this.UpdateStats(new TimeSpan());
             this.btnRun.State = 0;

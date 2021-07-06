@@ -10,10 +10,22 @@ namespace BMS
     // TODO: Придумать расход меда пчелой покадрово. 
     // что бы не расходовался мед оптом, для каждого полета к цветку.
 
+    // Состояния И/ИЛИ ДИРЕКТИВЫ пчелы.    
+    enum BeeState : byte
+    {
+        Idle,            // Свободна
+        FlyingToFlower,  // Летит на цветок
+        GatheringNectar, // Собирает нектар
+        ReturningToHive, // Возвращается в улей
+        MakingHoney,     // Производит мед
+        Retired          // Не трудоспособна.
+    }
+
     // Пчела.
     class Bee
     {
-        public static Action<int, string> changeBeeState; 
+        // смена состояния пчелы <beeID, текущее, новое>.
+        public static Action<int, BeeState, BeeState> changeBeeState; 
         public static Random rand;
         // потребление меда пчелой.
         protected const double HONEY_CONSUMED = 0.3;
@@ -41,16 +53,7 @@ namespace BMS
         // цветок для сбора нектара.
         protected Flower destinationFlower;
 
-        // Состояния И/ИЛИ ДИРЕКТИВЫ пчелы.    
-        protected enum BeeState : byte
-        {
-            Idle,            // Свободна
-            FlyingToFlower,  // Летит на цветок
-            GatheringNectar, // Собирает нектар
-            ReturningToHive, // Возвращается в улей
-            MakingHoney,     // Производит мед
-            Retired          // Не трудоспособна.
-        }
+
         // расшифрока статусов, при показе статистики.
         protected Dictionary<BeeState, string> descripeBeeState;
         // текущее состояние пчелы.
@@ -63,8 +66,8 @@ namespace BMS
             }
             set
             {
+                changeBeeState?.Invoke(this.ID, this.currentState, value);
                 this.currentState = value;
-                changeBeeState?.Invoke(this.ID, this.descripeBeeState[value]);
             }
         }
         // выработала ли свой ресурс пчела.
@@ -107,8 +110,6 @@ namespace BMS
             CurrentState = BeeState.Idle; // TODO: Разобраться почему при первичном запуске все нормально. А при резете - this.descripeBeeState[value] = НУЛЛ!
             myHive = hive;
             myWorld = world;
-
-
         }
 
         public void Go()
