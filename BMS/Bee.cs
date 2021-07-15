@@ -13,7 +13,7 @@ namespace BMS
     // Состояния И/ИЛИ ДИРЕКТИВЫ пчелы.    
     enum BeeState : byte
     {
-        Idle,            // Свободна
+        Idle=1,            // Свободна
         FlyingToFlower,  // Летит на цветок
         GatheringNectar, // Собирает нектар
         ReturningToHive, // Возвращается в улей
@@ -21,12 +21,15 @@ namespace BMS
         Retired          // Не трудоспособна.
     }
 
+    // смена состояния пчелы <beeID, текущее, предыдущее>.
+    delegate void ChangeBeeState(int beeID, BeeState current, BeeState previus);
+
     // Пчела.
     class Bee
     {
-        // смена состояния пчелы <beeID, текущее, новое>.
-        public static Action<int, BeeState, BeeState> changeBeeState; 
+        public static ChangeBeeState changeBeeState; 
         public static Random rand;
+
         // потребление меда пчелой.
         protected const double HONEY_CONSUMED = 0.3;
         // единиц перемещения за цикл.
@@ -52,12 +55,20 @@ namespace BMS
         protected int ID;
         // цветок для сбора нектара.
         protected Flower destinationFlower;
-
-
-        // расшифрока статусов, при показе статистики.
-        protected Dictionary<BeeState, string> descripeBeeState;
-        // текущее состояние пчелы.
+        // описания статусов, при показе статистики.
+        public static Dictionary<BeeState, string> DescripeBeeState = new Dictionary<BeeState, string>
+        {
+            {BeeState.Idle,  "Простаивает" },
+            {BeeState.FlyingToFlower, "Летит к цветку" },
+            {BeeState.GatheringNectar, "Собирает нектар" },
+            {BeeState.ReturningToHive, "Летит в улей" },
+            {BeeState.MakingHoney, "Производит мед" },
+            {BeeState.Retired, "Ресурс исчерпан" }
+        };
+        
+        // состояние пчелы.
         protected BeeState currentState;
+        protected BeeState previousState;
         protected BeeState CurrentState 
         {   
             get
@@ -66,8 +77,11 @@ namespace BMS
             }
             set
             {
-                changeBeeState?.Invoke(this.ID, this.currentState, value);
-                this.currentState = value;
+                if (this.currentState != value) { 
+                    this.previousState = this.currentState;
+                    this.currentState = value;
+                    changeBeeState?.Invoke(this.ID, this.currentState, this.previousState);
+                }
             }
         }
         // выработала ли свой ресурс пчела.
@@ -91,15 +105,6 @@ namespace BMS
                 {BeeState.MakingHoney,     bsMakingHoney },
                 {BeeState.ReturningToHive, bsReturningToHive },
                 {BeeState.Retired,         bsRetired }
-            };
-            descripeBeeState = new Dictionary<BeeState, string>()
-            {
-                {BeeState.Idle,  "Простаивает" },
-                {BeeState.FlyingToFlower, "Летит к цветку" },
-                {BeeState.GatheringNectar, "Собирает нектар" },
-                {BeeState.ReturningToHive, "Летит в улей" },
-                {BeeState.MakingHoney, "Производит мед" },
-                {BeeState.Retired, "Ресурс исчерпан" }
             };
             ID = id;
             Age = 0;

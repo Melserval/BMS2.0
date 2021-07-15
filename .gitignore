@@ -2,5 +2,6 @@
 .vs
 bin
 obj
+app.config
 /**/*.csproj
 /**/*.csproj.user

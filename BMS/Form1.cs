@@ -42,11 +42,11 @@ namespace BMS
                 {BeeState.MakingHoney, 0 },
                 {BeeState.Retired, 0 }
             };
-            Bee.changeBeeState += (int id, BeeState bsPrev, BeeState bsNew) =>
+            Bee.changeBeeState += (int id, BeeState bsNew, BeeState bsPrev) =>
             {
                 this.toolStripStatus_beeStateInfo.Text = $"Bee#{id} {bsNew}";
-                this.beeStatesStats[bsNew]++;
-                if (bsNew != bsPrev) this.beeStatesStats[bsPrev]--; //HACK
+                if (this.beeStatesStats.ContainsKey(bsNew)) this.beeStatesStats[bsNew]++;
+                if (this.beeStatesStats.ContainsKey(bsPrev)) this.beeStatesStats[bsPrev]--;
             };
             world = new World();
             UpdateStats(new TimeSpan());
