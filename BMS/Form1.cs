@@ -33,6 +33,7 @@ namespace BMS
             this.timer_frame.Interval = 50;
             this.timer_frame.Tick += new EventHandler(RunFrame);
 
+            // количество пчел в каждом статусе в текущем кадре.
             this.beeStatesStats = new Dictionary<BeeState, int>
             {
                 {BeeState.Idle,  0 },
@@ -42,12 +43,13 @@ namespace BMS
                 {BeeState.MakingHoney, 0 },
                 {BeeState.Retired, 0 }
             };
-            Bee.changeBeeState += (int id, BeeState bsNew, BeeState bsPrev) =>
+            Bee.changeBeeState += (BeeStateInfo binfo) =>
             {
-                this.toolStripStatus_beeStateInfo.Text = $"Bee#{id} {bsNew}";
-                if (this.beeStatesStats.ContainsKey(bsNew)) this.beeStatesStats[bsNew]++;
-                if (this.beeStatesStats.ContainsKey(bsPrev)) this.beeStatesStats[bsPrev]--;
+                this.toolStripStatus_beeStateInfo.Text = $"Bee#{binfo.beeid} {binfo.current}";
+                if (this.beeStatesStats.ContainsKey(binfo.current)) this.beeStatesStats[binfo.current]++;
+                if (this.beeStatesStats.ContainsKey(binfo.previous)) this.beeStatesStats[binfo.previous]--;
             };
+
             world = new World();
             UpdateStats(new TimeSpan());
         }

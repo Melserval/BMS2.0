@@ -45,6 +45,8 @@ namespace BMS
             }
             Honey = 3.20;
             myWorld = world;
+            Bee.changeBeeState += this.ObserveBeeState;
+
             // координаты относительно внутреннего пространства улья.
             locations = new Dictionary<PlaceName, Point>
             {
@@ -105,6 +107,16 @@ namespace BMS
 
             // TODO: добавить пчелу в систему. Нужно коллецию чел привязать к улью. Или как то учитывать их количество.
             this.myWorld.bees.Add(newBee);
+
+        }
+
+        private void ObserveBeeState(BeeStateInfo binfo)
+        {
+            // Обработка убывания пчел
+            if (binfo.current == BeeState.Retired)
+            {   // TODO: Добавить проверки принадлежности пчелы к конкредному улью. Что бы учитывать только своих пчел.
+                this.beeCount--;
+            }
 
         }
 

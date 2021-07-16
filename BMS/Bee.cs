@@ -21,8 +21,15 @@ namespace BMS
         Retired          // Не трудоспособна.
     }
 
+    struct BeeStateInfo
+    {
+        public int beeid;
+        public BeeState current;
+        public BeeState previous;
+    }
+
     // смена состояния пчелы <beeID, текущее, предыдущее>.
-    delegate void ChangeBeeState(int beeID, BeeState current, BeeState previus);
+    delegate void ChangeBeeState(BeeStateInfo beeinfo);
 
     // Пчела.
     class Bee
@@ -80,7 +87,13 @@ namespace BMS
                 if (this.currentState != value) { 
                     this.previousState = this.currentState;
                     this.currentState = value;
-                    changeBeeState?.Invoke(this.ID, this.currentState, this.previousState);
+                    changeBeeState?.Invoke(
+                        new BeeStateInfo { 
+                            beeid = this.ID, 
+                            current = this.currentState, 
+                            previous = this.previousState 
+                        }
+                    );
                 }
             }
         }
@@ -171,7 +184,8 @@ namespace BMS
             {
                 Flower flower = myWorld.flowers[rand.Next(myWorld.flowers.Count)];
 
-                // если цветок не подходящий - на следующем цикле ищется новый.
+                // если цветок подходящий - назначается как цель.
+                // иначе на следующем цикле ищется новый цветок.
                 if (flower.Nectar >= MIN_FLOWER_NECTAR && flower.Alive) 
                 {
                     this.destinationFlower = flower;
